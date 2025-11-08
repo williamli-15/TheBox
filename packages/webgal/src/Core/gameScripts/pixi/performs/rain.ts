@@ -3,6 +3,7 @@ import * as PIXI from 'pixi.js';
 import { registerPerform } from '@/Core/util/pixiPerformManager/pixiPerformManager';
 import { WebGAL } from '@/Core/WebGAL';
 import { SCREEN_CONSTANTS } from '@/Core/util/constants';
+import { getGameAssetPath } from '@/Core/gameState';
 
 type ContainerType = 'foreground' | 'background';
 
@@ -59,7 +60,7 @@ const pixiRain = (
   const raindropTextures: PIXI.Texture[] = [];
   const raindrops: RaindropSprite[] = [];
 
-  const baseTexturePath = './game/tex/rain.png';
+  const baseTexturePath = getGameAssetPath('tex/rain.png');
   const SPRITE_WIDTH = 128;
   const SPRITE_HEIGHT = 640;
   const NUM_SPRITES = 5;

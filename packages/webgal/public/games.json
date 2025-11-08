@@ -1,0 +1,14 @@
+[
+  {
+    "slug": "defaultgame",
+    "name": "欢迎使用 WebGAL",
+    "author": "WebGAL Team",
+    "cover": "games/defaultgame/background/WebGalEnter.webp"
+  },
+  {
+    "slug": "story-lab",
+    "name": "Story Lab",
+    "author": "Local Draft",
+    "cover": "games/story-lab/background/cover.png"
+  }
+]

@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { IWebGALStyleObj } from 'webgal-parser/build/types/styleParser';
 import { logger } from '@/Core/util/logger';
+import { getGameAssetPath } from '@/Core/gameState';
 
 export default function useApplyStyle(url: string) {
   const styleObject = useValue<IWebGALStyleObj>({ classNameStyles: {}, others: '' });
@@ -25,7 +26,7 @@ export default function useApplyStyle(url: string) {
 
   const updateStyleFile = async () => {
     logger.debug('更新 Scss 文件', url);
-    const resp = await axios.get(`game/template/${url}`);
+    const resp = await axios.get(getGameAssetPath(`template/${url}`));
     const scssStr = resp.data;
     styleObject.set(scss2cssinjsParser(scssStr));
   };

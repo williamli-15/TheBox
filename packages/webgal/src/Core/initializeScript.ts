@@ -14,6 +14,7 @@ import PixiStage from '@/Core/controller/stage/pixi/PixiController';
 import axios from 'axios';
 import { __INFO } from '@/config/info';
 import { WebGAL } from '@/Core/WebGAL';
+import { getGameAssetPath } from '@/Core/gameState';
 
 const u = navigator.userAgent;
 export const isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); // 判断是否是 iOS终端
@@ -40,11 +41,11 @@ export const initializeScript = (): void => {
   }
 
   // 获得 userAnimation
-  loadStyle('./game/userStyleSheet.css');
+  loadStyle(getGameAssetPath('userStyleSheet.css'));
   // 获得 user Animation
   getUserAnimation();
   // 获取游戏信息
-  infoFetcher('./game/config.txt');
+  infoFetcher(getGameAssetPath('config.txt'));
   // 获取start场景
   const sceneUrl: string = assetSetter('start.txt', fileType.scene);
   // 场景写入到运行时
@@ -91,10 +92,10 @@ function loadStyle(url: string) {
 }
 
 function getUserAnimation() {
-  axios.get('./game/animation/animationTable.json').then((res) => {
+  axios.get(getGameAssetPath('animation/animationTable.json')).then((res) => {
     const animations: Array<string> = res.data;
     for (const animationName of animations) {
-      axios.get(`./game/animation/${animationName}.json`).then((res) => {
+      axios.get(getGameAssetPath(`animation/${animationName}.json`)).then((res) => {
         if (res.data) {
           const userAnimation = {
             name: animationName,

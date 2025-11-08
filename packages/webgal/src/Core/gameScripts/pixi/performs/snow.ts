@@ -3,6 +3,7 @@ import * as PIXI from 'pixi.js';
 import { registerPerform } from '@/Core/util/pixiPerformManager/pixiPerformManager';
 import { WebGAL } from '@/Core/WebGAL';
 import { SCREEN_CONSTANTS } from '@/Core/util/constants';
+import { getGameAssetPath } from '@/Core/gameState';
 
 type ContainerType = 'foreground' | 'background';
 
@@ -60,7 +61,7 @@ const pixiSnow = (
   const snowflakeTextures: PIXI.Texture[] = [];
   const snowflakes: SnowflakeSprite[] = [];
 
-  const baseTexturePath = './game/tex/snow.png';
+  const baseTexturePath = getGameAssetPath('tex/snow.png');
   const SPRITE_WIDTH = 128;
   const SPRITE_HEIGHT = 128;
   const NUM_SPRITES = 10;

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useState } from 'react';
 import { initializeScript } from '@/Core/initializeScript';
 import Translation from '@/UI/Translation/Translation';
 import { Stage } from '@/Stage/Stage';
@@ -12,11 +12,26 @@ import Menu from '@/UI/Menu/Menu';
 import GlobalDialog from '@/UI/GlobalDialog/GlobalDialog';
 import PanicOverlay from '@/UI/PanicOverlay/PanicOverlay';
 import DevPanel from '@/UI/DevPanel/DevPanel';
+import { Gallery } from '@/Gallery/Gallery';
+import { gameState } from '@/Core/gameState';
 
 export default function App() {
-  useEffect(() => {
-    initializeScript();
-  }, []);
+  const [view, setView] = useState<'gallery' | 'game'>('gallery');
+  const [hasStarted, setHasStarted] = useState(false);
+
+  const handleGameStart = (slug: string) => {
+    gameState.activeGameSlug = slug;
+    if (!hasStarted) {
+      initializeScript();
+      setHasStarted(true);
+    }
+    setView('game');
+  };
+
+  if (view === 'gallery') {
+    return <Gallery onGameSelect={handleGameStart} />;
+  }
+
   return (
     <div className="App">
       <Translation />

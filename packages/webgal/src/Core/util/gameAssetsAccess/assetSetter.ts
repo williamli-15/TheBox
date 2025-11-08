@@ -1,3 +1,5 @@
+import { getGameAssetPath } from '@/Core/gameState';
+
 /**
  * @file 资源的引入可能是绝对链接，也可能是文件名，必须做必要的处理。
  */
@@ -25,32 +27,24 @@ export const assetSetter = (fileName: string, assetType: fileType): string => {
   // 是绝对链接，直接返回
   if (fileName.match('http://') || fileName.match('https://')) {
     return fileName;
-  } else {
-    // 根据类型拼接资源的相对路径
-    let returnFilePath: string;
-    switch (assetType) {
-      case fileType.background:
-        returnFilePath = `./game/background/${fileName}`;
-        break;
-      case fileType.scene:
-        returnFilePath = `./game/scene/${fileName}`;
-        break;
-      case fileType.vocal:
-        returnFilePath = `./game/vocal/${fileName}`;
-        break;
-      case fileType.figure:
-        returnFilePath = `./game/figure/${fileName}`;
-        break;
-      case fileType.bgm:
-        returnFilePath = `./game/bgm/${fileName}`;
-        break;
-      case fileType.video:
-        returnFilePath = `./game/video/${fileName}`;
-        break;
-      default:
-        returnFilePath = ``;
-        break;
-    }
-    return returnFilePath;
+  }
+
+  switch (assetType) {
+    case fileType.background:
+      return getGameAssetPath(`background/${fileName}`);
+    case fileType.scene:
+      return getGameAssetPath(`scene/${fileName}`);
+    case fileType.vocal:
+      return getGameAssetPath(`vocal/${fileName}`);
+    case fileType.figure:
+      return getGameAssetPath(`figure/${fileName}`);
+    case fileType.bgm:
+      return getGameAssetPath(`bgm/${fileName}`);
+    case fileType.video:
+      return getGameAssetPath(`video/${fileName}`);
+    case fileType.tex:
+      return getGameAssetPath(`tex/${fileName}`);
+    default:
+      return getGameAssetPath(fileName);
   }
 };

@@ -10,6 +10,7 @@ import { WebGAL } from '@/Core/WebGAL';
 import { get, replace } from 'lodash';
 import useEscape from '@/hooks/useEscape';
 import { getBooleanArgByKey, getNumberArgByKey, getStringArgByKey } from '../util/getSentenceArg';
+import { getGameAssetPath } from '@/Core/gameState';
 /**
  * 显示一小段黑屏演示
  * @param sentence
@@ -35,7 +36,8 @@ export const intro = (sentence: ISentence): IPerform => {
       break;
   }
   const backgroundImageFromArgs = getStringArgByKey(sentence, 'backgroundImage') ?? '';
-  const backgroundImage = `url("game/background/${backgroundImageFromArgs}") center/cover no-repeat`;
+  const backgroundUrl = getGameAssetPath(`background/${backgroundImageFromArgs}`);
+  const backgroundImage = `url("${backgroundUrl}") center/cover no-repeat`;
   const backgroundColor = getStringArgByKey(sentence, 'backgroundColor') ?? 'rgba(0, 0, 0, 1)';
   const color = getStringArgByKey(sentence, 'fontColor') ?? 'rgba(255, 255, 255, 1)';
   const animationFromArgs = getStringArgByKey(sentence, 'animation') ?? '';
