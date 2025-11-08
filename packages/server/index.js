@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const rl = require('readline');
 const open = require('open');
+const runtimeSceneProvider = require('./runtimeSceneProvider');
 
 // 读取控制台输入
 const readline = rl.createInterface({
@@ -14,6 +15,25 @@ const readline = rl.createInterface({
 const server = new express();
 const Port = process.env.PORT || 3000;
 const logger = new Cloudlog();
+
+const runtimeSliceRoute = /^\/games\/([^/]+)\/scene\/runtime\/(.+\.txt)$/;
+
+server.get(runtimeSliceRoute, async (req, res) => {
+    const gameSlug = req.params[0];
+    const slicePath = req.params[1];
+    const sliceId = slicePath.replace(/\.txt$/, '');
+    try {
+        const script = await runtimeSceneProvider.getRuntimeSlice(gameSlug, sliceId);
+        if (!script) {
+            logger.warn(`运行时切片 ${gameSlug}/${sliceId} 未返回内容`);
+            return res.status(404).type('text/plain; charset=utf-8').send(`;runtime slice ${sliceId} missing;\nend;`);
+        }
+        return res.type('text/plain; charset=utf-8').send(script);
+    } catch (err) {
+        logger.error(`生成运行时切片 ${gameSlug}/${sliceId} 失败`, err);
+        return res.status(500).type('text/plain; charset=utf-8').send(`;runtime slice ${sliceId} error;\nend;`);
+    }
+});
 
 // 读取控制台数据
 const args = process.argv;

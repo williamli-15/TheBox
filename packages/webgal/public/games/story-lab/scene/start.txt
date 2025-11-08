@@ -2,7 +2,7 @@ intro:这是我们用纯代码做的第一个 demo|不需要 GUI，只用仓库 
 ; 你可以不放图，先跑文本；放图的话把 bg.png 丢到 background 目录
 changeBg:bg.png -next;
 :今天去哪儿呢？;
-choose:去商店:chapter_01/shop.txt|在家:home;
+choose:去商店:chapter_01/shop.txt|在家:home|体验AI剧情:runtime/ai-demo/entry.txt;
 ;
 label:home;
 :还是在家写点代码吧……;
