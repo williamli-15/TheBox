@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const llmProvider = require('./llmProvider');
 
 // 允许通过环境变量覆盖默认的运行时剧情生成器
 let customProvider = null;
@@ -13,41 +14,47 @@ if (providerPath && fs.existsSync(providerPath)) {
 
 const normalizeSliceId = (sliceId) => sliceId.replace(/\\/g, '/').replace(/\.txt$/, '');
 
-const demoSlices = {
-  'story-lab': {
-    'ai-demo/entry': `
-intro:正在请求即时生成的剧情|这一段内容由 server/runtimeSceneProvider.js 动态返回;
-:你跟随匿名委托来到废弃的讯号塔。;
-choose:追踪信号:runtime/ai-demo/signal.txt|先观察周围:runtime/ai-demo/camp.txt;
-`,
-    'ai-demo/signal': `
-changeBg:bg.png -next;
-:信号越来越清晰，塔顶忽然亮起蓝色脉冲。;
-:你决定沿着扶梯往上，准备截获来源。;
-changeScene:chapter_01/shop.txt;
-`,
-    'ai-demo/camp': `
-:你蹲守在旧营地的阴影里，录下塔的每一次闪烁。;
-choose:耐心等待:runtime/ai-demo/camp.txt|立刻驶向讯号塔:runtime/ai-demo/signal.txt|回到静态剧情:chapter_01/shop.txt;
-`,
-  },
-};
+const fallbackSlice = (gameSlug, sliceId) => `intro:${gameSlug}/${sliceId} 未能生成剧情，请检查 LLM 配置;`;
 
-const fallbackSlice = (gameSlug, sliceId) => `;${gameSlug}:${sliceId} 未提供运行时脚本，检查 server/runtimeSceneProvider.js;\nend;`;
+async function tryProvider(provider, label, slug, sliceId) {
+  if (!provider || typeof provider.getRuntimeSlice !== 'function') {
+    return null;
+  }
+  console.info(`[runtime] -> ${label} request ${slug}/${sliceId}`);
+  try {
+    const result = await provider.getRuntimeSlice(slug, sliceId);
+    if (result && result.trim().length > 0) {
+      console.info(`[runtime] <- ${label} produced ${result.length} chars for ${slug}/${sliceId}`);
+      return result;
+    }
+    console.warn(`[runtime] ${label} returned empty result for ${slug}/${sliceId}`);
+  } catch (err) {
+    console.error(`[runtime] ${label} failed for ${slug}/${sliceId}:`, err);
+  }
+  return null;
+}
 
 async function getRuntimeSlice(gameSlug, rawSliceId) {
   const normalizedSlug = (gameSlug || 'default').toLowerCase();
   const sliceId = normalizeSliceId(rawSliceId);
 
-  if (customProvider && typeof customProvider.getRuntimeSlice === 'function') {
-    const customResult = await customProvider.getRuntimeSlice(normalizedSlug, sliceId);
-    if (customResult) {
-      return customResult;
+  const providers = [];
+  if (customProvider) {
+    providers.push({ provider: customProvider, label: 'custom-provider' });
+  }
+  if (process.env.OPENAI_API_KEY) {
+    providers.push({ provider: llmProvider, label: 'llm-provider' });
+  }
+
+  for (const { provider, label } of providers) {
+    const res = await tryProvider(provider, label, normalizedSlug, sliceId);
+    if (res) {
+      return res;
     }
   }
 
-  const storyDeck = demoSlices[normalizedSlug] || demoSlices['story-lab'] || {};
-  return storyDeck[sliceId] || fallbackSlice(normalizedSlug, sliceId);
+  console.error(`[runtime] fallback reached for ${normalizedSlug}/${sliceId}`);
+  return fallbackSlice(normalizedSlug, sliceId);
 }
 
 module.exports = {

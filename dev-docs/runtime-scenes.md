@@ -13,12 +13,19 @@ Plan B from the AI-runtime discussion is now wired into the dev server. When a s
 
 ### Customising the provider
 
-- Copy `packages/server/runtimeSceneProvider.js` somewhere else, implement your own `getRuntimeSlice(gameSlug, sliceId)` and export it via `module.exports`.
-- Start the dev server with `WEBGAL_RUNTIME_PROVIDER=relative/path/to/custom-provider.js yarn workspace WebGAL-Server start`.
-- The provider receives:
-  - `gameSlug`: folder name under `public/games`.
-  - `sliceId`: string such as `ai-demo/entry` (without `.txt`).
-- Return plain WebGAL script text. You can call an LLM here, stream files, or query your backend.
+- 直接使用示例 LLM 提供器：`packages/server/llmProvider.js`（依赖 `OPENAI_API_KEY`，可通过 `OPENAI_MODEL` 覆盖模型名称）。
+  启动方式：
+  ```bash
+  cd packages/server
+  OPENAI_API_KEY=sk-xxx WEBGAL_RUNTIME_PROVIDER=./llmProvider.js node index.js ../webgal
+  ```
+- 每次调用都会把 **输入提示（system/user）** 和 **输出脚本** 写到 `packages/server/logs/runtime-YYYYMMDD.log`（默认每次启动都会自动清空当日的日志；如需累计追加可设置 `WEBGAL_RUNTIME_LOG_APPEND=true`）。控制台只展示一条裁剪后的 preview（默认 200 字）。可用 `WEBGAL_RUNTIME_LOG_DIR`、`WEBGAL_RUNTIME_LOG_PREVIEW` 调整目录与截断长度。
+- 或者复制 `packages/server/runtimeSceneProvider.js` 到其他位置，实现自定义的 `getRuntimeSlice(gameSlug, sliceId)` 并 `module.exports`。
+- 启动 server 时用 `WEBGAL_RUNTIME_PROVIDER=relative/path/to/custom-provider.js yarn workspace WebGAL-Server start` 指向它。
+- provider 会收到：
+  - `gameSlug`: `public/games` 下的目录名。
+  - `sliceId`: 例如 `ai-demo/entry`（即 `runtime/*.txt` 的路径去掉 `.txt`）。
+- 返回值必须是纯 WebGAL 脚本文本。这里面可以调用任意 LLM、RAG、后端接口等。
 
 ### Front-end details
 
