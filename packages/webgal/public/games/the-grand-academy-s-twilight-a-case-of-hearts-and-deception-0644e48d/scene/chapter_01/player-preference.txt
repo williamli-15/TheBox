@@ -1,0 +1,8 @@
+:The library's vaulted ceiling casts long shadows, the air thick with ancient dust and unspoken secrets;
+:My fingers brush against forbidden texts, a strange energy humming beneath their leather bindings;
+:A hushed voice startles me, "Looking for something specific, or just getting lost in the archives?";
+:I turn to see Sera, the reclusive genius, her spectacles glinting in the dim light;
+:Sera:Some of these tomes hold more than just knowledge. They hold warnings;
+:My heart quickens. Could she know about the Academy's true nature, or even my own past?;
+:Sera watches me, a knowing look in her eyes, as if she can read my hidden anxieties;
+choose:Ask about the warnings:runtime/chapter_01/library-secrets.txt|Change the subject:runtime/chapter_01/library-distraction.txt;
