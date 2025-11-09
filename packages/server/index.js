@@ -98,6 +98,50 @@ function resolveGameDir(slug) {
     return null;
 }
 
+function normalizeSliceId(value) {
+    if (!value || typeof value !== 'string') return null;
+    let normalized = value.trim();
+    if (!normalized) return null;
+    normalized = normalized.replace(/^runtime\//, '').replace(/\.txt$/, '');
+    if (!normalized.includes('/')) {
+        normalized = `act-1/${normalized}`;
+    }
+    return normalized;
+}
+
+function collectWarmupSliceIds(plan) {
+    const result = [];
+    const seen = new Set();
+    const push = (value) => {
+        const normalized = normalizeSliceId(value);
+        if (normalized && !seen.has(normalized)) {
+            seen.add(normalized);
+            result.push(normalized);
+        }
+    };
+    push(plan?.warmup?.entry);
+    const primarySeeds = Array.isArray(plan?.params?.primaryRuntimeSeeds)
+        ? plan.params.primaryRuntimeSeeds
+        : [];
+    const secondarySeeds = Array.isArray(plan?.params?.secondaryRuntimeSeeds)
+        ? plan.params.secondaryRuntimeSeeds
+        : [];
+    for (const seed of [...primarySeeds, ...secondarySeeds]) {
+        if (!seed || typeof seed !== 'string') continue;
+        const trimmed = seed.trim();
+        if (!trimmed) continue;
+        if (trimmed.includes('/')) {
+            push(trimmed);
+        } else {
+            push(`act-1/${trimmed}`);
+        }
+    }
+    if (result.length === 0) {
+        push('act-1/entry');
+    }
+    return result;
+}
+
 server.get('/api/games', async (req, res) => {
     try {
         const games = await listPublishedGames();
@@ -301,15 +345,17 @@ async function warmupRuntime() {
         for (const slug of slugs) {
             const gameDir = path.join(base, slug);
             const plan = getPlan(gameDir);
-            const entry = plan?.warmup?.entry || 'act-1/entry';
             const depth = plan?.warmup?.depth ?? 2;
-            logger.info(`[warmup] 预取 ${slug} runtime/${entry}.txt depth=${depth}`);
-            await runtimeWindow.ensureSlice(slug, entry, {
-                gameDir,
-                prefetch: true,
-                depth,
-                sid: `warmup-${slug}`,
-            });
+            const sliceIds = collectWarmupSliceIds(plan);
+            for (const sliceId of sliceIds) {
+                logger.info(`[warmup] 预取 ${slug} runtime/${sliceId}.txt depth=${depth}`);
+                await runtimeWindow.ensureSlice(slug, sliceId, {
+                    gameDir,
+                    prefetch: true,
+                    depth,
+                    sid: `warmup-${slug}`,
+                });
+            }
         }
     }
 }
@@ -324,16 +370,21 @@ async function bootstrapGame(slug, options = {}) {
     invalidatePlan(gameDir);
     const plan = getPlan(gameDir);
     const meta = await writeGameMeta(slug, plan, options, gameDir);
-    const entry = plan?.warmup?.entry || 'act-1/entry';
     const depth = plan?.warmup?.depth ?? 2;
     const warmupSession = options.sessionId || `bootstrap-${slug}`;
-    logger.info(`[bootstrap] 预取 ${slug} runtime/${entry}.txt depth=${depth} sid=${warmupSession}`);
-    await runtimeWindow.ensureSlice(slug, entry, {
-        gameDir,
-        prefetch: true,
-        depth,
-        sid: warmupSession,
-    });
+    const sliceIds = collectWarmupSliceIds(plan);
+    const entry = sliceIds[0] || 'act-1/entry';
+    for (const sliceId of sliceIds) {
+        logger.info(
+            `[bootstrap] 预取 ${slug} runtime/${sliceId}.txt depth=${depth} sid=${warmupSession}`,
+        );
+        await runtimeWindow.ensureSlice(slug, sliceId, {
+            gameDir,
+            prefetch: true,
+            depth,
+            sid: warmupSession,
+        });
+    }
     const derivedTitle =
         meta?.name ||
         plan?.title ||

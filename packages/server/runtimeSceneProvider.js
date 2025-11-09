@@ -17,7 +17,23 @@ if (providerPath && fs.existsSync(providerPath)) {
 const { hasLLMProvider } = require('./llmClient');
 const hasLLM = hasLLMProvider;
 
-const normalizeSliceId = (sliceId) => sliceId.replace(/\\/g, '/').replace(/\.txt$/, '');
+const normalizeSliceId = (sliceId) => {
+  if (!sliceId) {
+    return 'act-1/entry';
+  }
+  let normalized = String(sliceId).replace(/\\/g, '/').trim();
+  if (!normalized) {
+    return 'act-1/entry';
+  }
+  normalized = normalized.replace(/\.txt$/, '');
+  if (normalized.startsWith('runtime/')) {
+    normalized = normalized.slice('runtime/'.length);
+  }
+  if (!normalized.includes('/')) {
+    normalized = `act-1/${normalized}`;
+  }
+  return normalized;
+};
 
 const fallbackSlice = (gameSlug, sliceId) => `intro:${gameSlug}/${sliceId} 未能生成剧情，请检查 LLM 配置;`;
 
@@ -66,6 +82,24 @@ async function getRuntimeSlice(gameSlug, rawSliceId, options = {}) {
       };
     } catch (err) {
       console.error(`[runtime] failed to load plan for ${normalizedSlug}:`, err.message);
+    }
+  }
+
+  if (gameDir) {
+    const staticPath = path.join(gameDir, 'scene', 'runtime', `${sliceId}.txt`);
+    if (fs.existsSync(staticPath)) {
+      try {
+        const text = fs.readFileSync(staticPath, 'utf-8').trim();
+        if (text) {
+          if (!context?.prefetch && context?.plan) {
+            recordSlice(normalizedSlug, context.session, context.plan, text);
+            updateSignalsFromSlice(normalizedSlug, context.session, context.plan, text);
+          }
+          return text;
+        }
+      } catch (err) {
+        console.warn(`[runtime] failed to read static runtime seed ${staticPath}: ${err.message}`);
+      }
     }
   }
 

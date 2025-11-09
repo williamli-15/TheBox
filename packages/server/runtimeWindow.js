@@ -49,8 +49,8 @@ function extractTargets(text) {
   if (!body) return [];
   return body.split('|').map((item) => {
     const segments = item.split(':');
-    const target = segments.slice(-1)[0];
-    return target.replace(/\.txt$/, '');
+    const target = segments.slice(-1)[0] || '';
+    return target.trim().replace(/\.txt$/, '');
   });
 }
 
