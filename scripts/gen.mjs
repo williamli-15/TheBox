@@ -724,19 +724,44 @@ async function generatePlan() {
     const notes = await brainstormPlanNotes(seed);
     const plan = await structurePlanFromNotes(notes);
     plan.title = plan.title || USER_TITLE || plan.premise;
+    const primaryBranchLabel =
+      plan.params?.primaryBranchLabel ||
+      (seed.tag ? `Explore ${seed.tag}` : 'Explore the unknown');
+    const primaryBranchSlug =
+      plan.params?.primaryBranchSlug || slugifyLite(primaryBranchLabel) || 'branch';
+    const secondaryBranchLabel =
+      plan.params?.secondaryBranchLabel ||
+      plan.params?.runtimeOptionLabel ||
+      'Secondary Lead';
+    const secondaryBranchSlug =
+      plan.params?.secondaryBranchSlug ||
+      slugifyLite(secondaryBranchLabel) ||
+      'secondary-lead';
+    const primaryRuntimeSeeds =
+      plan.params?.primaryRuntimeSeeds || getRuntimeSeedsForBranch(primaryBranchSlug);
+    const secondaryRuntimeSeeds =
+      plan.params?.secondaryRuntimeSeeds || getRuntimeSeedsForBranch(secondaryBranchSlug);
     plan.params = {
       ...(plan.params || {}),
       playerBrief: seed.raw || USER_BRIEF || plan.params?.playerBrief || '',
       playerBriefExpanded: seed.line,
       playerBriefTag: seed.tag,
       playerTitle: USER_TITLE || plan.params?.playerTitle || '',
-      primaryBranchSlug:
-        plan.params?.primaryBranchSlug || slugifyLite(seed.tag) || 'branch',
-      primaryBranchLabel:
-        plan.params?.primaryBranchLabel ||
-        (seed.tag ? `Explore ${seed.tag}` : 'Explore the unknown'),
+      primaryBranchSlug,
+      primaryBranchLabel,
+      secondaryBranchSlug,
+      secondaryBranchLabel,
+      primaryRuntimeSeeds,
+      secondaryRuntimeSeeds,
     };
-    plan.warmup = plan.warmup || { entry: 'act-1/entry', depth: 2 };
+    const warmupDepth = plan.warmup?.depth ?? 2;
+    const currentWarmupEntry = (plan.warmup?.entry || '').trim();
+    const primarySeedEntry = `act-1/${primaryRuntimeSeeds[0]}`;
+    const resolvedWarmupEntry =
+      !currentWarmupEntry || currentWarmupEntry === 'act-1/entry'
+        ? primarySeedEntry
+        : currentWarmupEntry;
+    plan.warmup = { entry: resolvedWarmupEntry, depth: warmupDepth };
     await fs.writeFile(PLAN_PATH, JSON.stringify(plan, null, 2), 'utf-8');
     await appendGenLog('plan.generate.success', {
       path: PLAN_PATH,
