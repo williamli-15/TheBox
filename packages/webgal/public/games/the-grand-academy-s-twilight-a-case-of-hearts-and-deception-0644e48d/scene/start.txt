@@ -1,8 +1,0 @@
-intro:The carriage wheels grind on ancient cobblestones|A cold mist clings to the Grand Academy's spires|My past, a phantom limb, aches with every beat of my new heart;
-:The wrought iron gates loom, adorned with a crest I don't recognize;
-:A shiver traces my spine, a premonition of secrets yet to unfold;
-:My hand tightens on the satchel, its contents a silent promise and a heavy burden;
-:The air here smells of old parchment and something metallic, faintly unsettling;
-:A cloaked figure watches from a shadowed archway, then vanishes;
-:I step onto the manicured grounds, the silence echoing my apprehension;
-choose:Investigate the Archives:runtime/act-1/entry.txt|Wander the Campus:chapter_01/player-preference.txt;

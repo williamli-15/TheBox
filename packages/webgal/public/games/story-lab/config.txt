@@ -1,5 +1,0 @@
-Game_name:My First WebGAL;
-Game_key:mygm01;
-Title_img:Title.png;
-Enable_Appreciation:false;
-Default_Language:zh_CN;

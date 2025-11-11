@@ -1,8 +1,0 @@
-intro:Rain lashes against gothic spires|Aurelia Vance steps onto the Arcanum Academy grounds;
-:The air is thick with old money and older secrets, a scent of parchment and ozone;
-:My provisional prosecutor's badge feels heavy, a strange weight in this hallowed place;
-:Students in dark cloaks glide past, their hushed conversations hinting at deeper mysteries;
-:Elias Thorne's disappearance is already an unspoken shadow, lingering in every ornate hall;
-:A cryptic note, slipped under my door, mentions "The Vanishing Valedictorian's Vendetta";
-:My instincts prickle; this isn't just a missing person, it's an unraveling;
-choose:Examine the case details:runtime/act-1/entry.txt|Assess the academy's hierarchy:chapter_01/player-preference.txt;

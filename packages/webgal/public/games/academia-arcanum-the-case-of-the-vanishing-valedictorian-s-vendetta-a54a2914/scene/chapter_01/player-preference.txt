@@ -1,8 +1,0 @@
-:Aurelia:The stone corridors hum with a silent, ancient energy;
-:My footsteps echo, a stark contrast to the hushed reverence of the academy;
-:A framed portrait of a stern-faced Thorne ancestor seems to follow me with its gaze;
-:I notice Seraphina Dubois leaning against a gothic archway, observing me;
-:Seraphina Dubois:Lost already, Prosecutor Vance? Or just admiring the architecture?;
-:Her tone is laced with an unsettling blend of challenge and amusement;
-:I feel a prickle of unease; this place is far from welcoming;
-choose:Confront Seraphina:runtime/chapter_01/confront-seraphina.txt|Ignore her and proceed:runtime/chapter_01/ignore-seraphina.txt;
