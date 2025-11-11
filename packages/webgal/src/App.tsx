@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { initializeScript } from '@/Core/initializeScript';
 import Translation from '@/UI/Translation/Translation';
 import { Stage } from '@/Stage/Stage';
@@ -19,12 +19,15 @@ export default function App() {
   const [view, setView] = useState<'gallery' | 'game'>('gallery');
   const [hasStarted, setHasStarted] = useState(false);
 
-  const handleGameStart = (slug: string) => {
-    gameState.activeGameSlug = slug;
-    if (!hasStarted) {
+  useEffect(() => {
+    if (view === 'game' && !hasStarted) {
       initializeScript();
       setHasStarted(true);
     }
+  }, [view, hasStarted]);
+
+  const handleGameStart = (slug: string) => {
+    gameState.activeGameSlug = slug;
     setView('game');
   };
 

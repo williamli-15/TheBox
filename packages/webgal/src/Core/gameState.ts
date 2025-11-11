@@ -14,7 +14,7 @@ export const gameState = {
 /**
  * Returns the base path (relative to /public) of the active game.
  */
-export const getActiveGameBasePath = (): string => `./games/${gameState.activeGameSlug}`;
+export const getActiveGameBasePath = (): string => `/games/${gameState.activeGameSlug}`;
 
 /**
  * Resolve a relative resource path for the active game.
