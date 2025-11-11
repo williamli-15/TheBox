@@ -30,3 +30,11 @@ packages/webgal/src/Core/util/pixiPerformManager/initRegister.ts
 /gitingest-output
 /WebGAL_Doc
 scripts/export_gitingest.sh
+# 忽略所有 games 目录下的内容
+/packages/webgal/public/games/*
+
+# 但不要忽略 defaultgame 目录
+!/packages/webgal/public/games/defaultgame
+
+# 不要忽略 defaultgame 目录中的内容
+!/packages/webgal/public/games/defaultgame/**
